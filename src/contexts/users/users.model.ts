@@ -295,3 +295,10 @@ userSchema.pre('save', function (next) {
 
 // ✅ EXPORT
 export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
+
+
+
+
+
+
+

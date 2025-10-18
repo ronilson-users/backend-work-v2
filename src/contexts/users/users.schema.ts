@@ -13,21 +13,43 @@ export const UserRegisterSchema = z.object({
 /**
  * Schema de login de usuário
  */
+ 
 export const UserLoginSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must have at least 6 characters'),
 });
 
+
 /**
- * Schema de atualização de usuário (admin)
+ * Centralized Role enum so every consumer uses the same set of roles.
  */
-export const UserUpdateSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().email().optional(),
-  role: z.enum(['user', 'company', 'admin']).optional(),
-  isActive: z.boolean().optional(),
+ 
+export const RoleEnum = z.enum(['user', 'company', 'admin']);
+export type Role = z.infer<typeof RoleEnum>;
+
+/**
+ * Example create user schema — set default role to 'user'.
+ * Adjust the rest of the schema fields to match your existing file.
+ */
+ 
+export const createUserSchema = z.object({
+  // ... other fields (name, email, etc.)
+  role: RoleEnum.default('user'), // Usuário comum, empresa ou admin
+});
+
+/**
+ * Example update user schema — role is optional on updates,
+ * but still restricted to the enum values.
+ */export const updateUserSchema = z.object({
+  // ... other updatable fields
+  role: RoleEnum.optional(),
 });
 
 export type UserRegisterData = z.infer<typeof UserRegisterSchema>;
 export type UserLoginData = z.infer<typeof UserLoginSchema>;
 export type UserUpdateData = z.infer<typeof UserUpdateSchema>;
+
+
+
+
+
