@@ -27,9 +27,11 @@ router.use('/users', userRoutes);
 
 router.use('/jobs', jobRoutes);
 router.use('/contracts', contractRoutes);
-router.use('/payments', paymentRoutes);
+
 router.use('/work', workRoutes);
 
+router.use('/payments', paymentRoutes);// em analise
+// proximas maps / notifications outras....
 
 
 export default router;
