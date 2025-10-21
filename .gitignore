@@ -36,8 +36,9 @@ pnpm-debug.log*
 # ===========================
 # Testes e Cobertura
 # ===========================
+__tests__/
 coverage/
-__test__/fixtures/
+__tests__/fixtures/
 *.lcov
 *.coverage
 jest-cache/
@@ -65,7 +66,7 @@ jest-global-setup/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-..DOCS/
+.DOCS/
 
 # ===========================
 # Ferramentas e Builds Alternativos

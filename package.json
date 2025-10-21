@@ -8,13 +8,12 @@
   "build": "tsc",
   "start": "node dist/server.js",
   "test": "jest",
-  "test:unit": "jest jest --runInBand __test/unit",
-  "test:integration": "jest __test/integration",
+  "test:unit": "jest jest --runInBand __tests__/unit",
+  "test:integration": "jest __tests__/integration",
   "test:watch": "jest --watch",
   "test:coverage": "jest --coverage",
-  "test:auth": "jest __test/unit/middleware/auth.test.ts"
+  "test:auth": "jest __tests__/unit/middleware/auth.test.ts"
  },
- 
  "dependencies": {
   "bcryptjs": "^2.4.3",
   "compression": "^1.8.1",

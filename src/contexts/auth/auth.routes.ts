@@ -1,57 +1,38 @@
+// src/contexts/auth/auth.routes.ts
 import { Router } from 'express';
-
-//======= Controller Auth  ===================
-import * as AuthController from './auth.controller';
-
- 
-//======= Schemas Auth  ===================
-import {
- registerSchema,
- loginSchema
-} from './auth.schema';
-
+import { authController } from './auth.controller';
+import { validateBody } from '@/shared/middleware/validate';
+import { UserLoginSchema } from '../users/users.schema';
+import { authenticate } from '@/shared/middleware/auth';
 
 const router = Router();
 
-// ----------------------------------------
+
+//===================
+// 🔓 Rotas públicas
+//===================
+
+router.post('/login', validateBody(UserLoginSchema), authController.login);
+
+//====================
+// 🔐 Rotas protegidas
+//====================
+
+router.use(authenticate); // Middleware de autenticação para rotas abaixo
+
+//==============================================
 // 🔐 PROTECTED ROUTES (require authentication)
-// ----------------------------------------
+//==============================================
 
-/* router.post('/register', validateSchema(registerSchema), AuthController.register);
-
-router.post('/login', validateSchema(loginSchema), AuthController.login);
-
- */
-// 🎯 Rotas de auth.
-router.get('/', (req, res) => {
- res.json({ message: 'authRoutes routes - TODO' });
-});
+router.get('/profile', authController.getProfile);
+router.post('/refresh', authController.refreshToken);
 
 export const authRoutes = router;
 
 /**
  * 🎯 RESTful Pattern Reference:
- * POST   /register            → createJob
- * POST   /login               → createJob
+ * POST   /login         → 
+ * GET    /profile       → 
+ * POST   /refresh       → 
  
  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

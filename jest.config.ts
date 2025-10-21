@@ -9,7 +9,7 @@ const config: Config = {
  extensionsToTreatAsEsm: ['.ts'],
 
  // ✅ Paths
- roots: ['<rootDir>/__test'],
+ roots: ['<rootDir>/__tests__'],
  testMatch: ['**/*.test.ts'],
 
  // ✅ Module Mapping (seus aliases)
@@ -36,7 +36,7 @@ moduleNameMapper: {
  },
 
  // ✅ Setup
- setupFilesAfterEnv: ['<rootDir>/__test/setup.ts'],
+ setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
  
 };
 

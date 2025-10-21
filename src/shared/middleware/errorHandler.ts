@@ -1,3 +1,5 @@
+// src/shared/middleware.ts
+
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@/shared/utils/error';
 

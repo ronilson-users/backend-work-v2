@@ -14,6 +14,8 @@ export interface IJob extends Document {
   currency: string;
  };
  duration: string;
+ 
+ 
  status: 'open' | 'in_progress' | 'completed' | 'cancelled';
  dates: {
   start: Date;
@@ -140,7 +142,9 @@ const jobSchema = new Schema<IJob>(
  }
 );
 
-// ✅ INDEXES CORRETOS - SEM CHAVES EXTRAS
+//==========================
+//Indexes para performance
+//==========================
 jobSchema.index({ company: 1 });
 jobSchema.index({ status: 1 });
 jobSchema.index({ location: 1 });
@@ -149,5 +153,5 @@ jobSchema.index({ 'dates.start': 1, 'dates.end': 1 });
 jobSchema.index({ requiredSkills: 1 });
 jobSchema.index({ createdAt: -1 });
 
-// ✅ EXPORTS CORRETOS
+
 export const Job: Model<IJob> = mongoose.model<IJob>('Job', jobSchema);

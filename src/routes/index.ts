@@ -9,12 +9,11 @@ import { Router } from 'express';
 import {
  authRoutes,
  userRoutes,
- profileRoutes,
- companyRoutes,
  jobRoutes,
  contractRoutes,
  paymentRoutes,
- healthRoutes
+ healthRoutes,
+ workRoutes
 } from '../contexts';
 
 const router = Router();
@@ -25,11 +24,12 @@ router.use('/health', healthRoutes);
 
 // 🔒 Protected Routes
 router.use('/users', userRoutes);
-router.use('/profiles', profileRoutes);
-router.use('/companies', companyRoutes);
+
 router.use('/jobs', jobRoutes);
 router.use('/contracts', contractRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/work', workRoutes);
+
 
 
 export default router;

@@ -2,13 +2,16 @@
 import { Request, Response } from 'express';
 import { Job } from './jobs.model';
 import { CancellationService } from './jobs.service';
-import { asyncHandler } from '../../shared/utils/asyncHandler';
+import { asyncHandler } from '@/shared/utils/asyncHandler';
+
 
 // Create job
 export const createJob = asyncHandler(async (req: Request, res: Response) => {
+ 
   const companyId = (req as any).user.id;
   const jobData = { ...req.body, company: companyId };
   const job = await Job.create(jobData);
+  
   res.status(201).json({ message: 'Job created successfully', job });
 });
 

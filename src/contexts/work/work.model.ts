@@ -1,0 +1,352 @@
+// src/contexts/work/work.model.ts 
+import mongoose, { Schema, Document, Model } from 'mongoose';
+
+// 📸 Interface para Fotos (AGORA SENDO USADA)
+export interface WorkPhoto {
+  url: string;           // URL pública da foto
+  thumbnailUrl?: string; // URL da miniatura (para performance)
+  metadata: {
+    originalName: string;
+    size: number;
+    mimeType: string;
+    uploadedAt: Date;
+    takenAt?: Date;      // Quando a foto foi tirada (EXIF)
+    location?: {         // GPS se disponível
+      latitude: number;
+      longitude: number;
+    };
+    dimensions?: {
+      width: number;
+      height: number;
+    };
+  };
+}
+
+export interface IWorkSession extends Document {
+  // 🔗 Referências
+  contract: mongoose.Types.ObjectId;
+  worker: mongoose.Types.ObjectId;
+  company: mongoose.Types.ObjectId;
+  job: mongoose.Types.ObjectId;
+  
+  // 📍 Check-in
+  checkIn: {
+    timestamp: Date;
+    location: string;
+    coordinates?: {
+      latitude: number;
+      longitude: number;
+    };
+    photos: WorkPhoto[]; // ✅ CORRIGIDO: Agora usando WorkPhoto[]
+    notes?: string;
+    ipAddress?: string;
+  };
+  
+  // 📍 Check-out
+  checkOut?: {
+    timestamp: Date;
+    location: string;
+    coordinates?: {
+      latitude: number;
+      longitude: number;
+    };
+    photos: WorkPhoto[]; // ✅ CORRIGIDO: Agora usando WorkPhoto[]
+    hoursWorked: number;
+    completionNotes?: string;
+    ipAddress?: string;
+  };
+  
+  // 📊 Status e Metadados
+  status: 'active' | 'completed' | 'cancelled';
+  totalHours?: number;
+  breakTime?: number; // minutos de pausa
+  
+  // 💰 Informações de Pagamento
+  paymentStatus: 'pending' | 'confirmed' | 'processed' | 'paid';
+  calculatedAmount?: number;
+  
+  // ⚠️ Disputas
+  dispute?: {
+    raisedBy: 'worker' | 'company';
+    reason: string;
+    raisedAt: Date;
+    resolvedAt?: Date;
+    resolution?: string;
+  };
+  
+  // 📅 Metadados
+  workDate: Date; // Data do trabalho (YYYY-MM-DD)
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 📋 Schema para WorkPhoto (SUB-SCHEMA)
+const workPhotoSchema = new Schema<WorkPhoto>({
+  url: {
+    type: String,
+    required: [true, 'URL da foto é obrigatória']
+  },
+  thumbnailUrl: {
+    type: String
+  },
+  metadata: {
+    originalName: {
+      type: String,
+      required: [true, 'Nome original da foto é obrigatório']
+    },
+    size: {
+      type: Number,
+      required: [true, 'Tamanho da foto é obrigatório'],
+      min: [0, 'Tamanho não pode ser negativo']
+    },
+    mimeType: {
+      type: String,
+      required: [true, 'Tipo MIME é obrigatório']
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    },
+    takenAt: {
+      type: Date
+    },
+    location: {
+      latitude: Number,
+      longitude: Number
+    },
+    dimensions: {
+      width: Number,
+      height: Number
+    }
+  }
+}, { _id: false });
+
+const workSessionSchema = new Schema<IWorkSession>(
+  {
+    contract: {
+      type: Schema.Types.ObjectId,
+      ref: 'Contract',
+      required: [true, 'Contrato é obrigatório'],
+      
+    },
+    worker: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Worker é obrigatório'],
+      index: true
+    },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Company é obrigatória'],
+      index: true
+    },
+    job: {
+      type: Schema.Types.ObjectId,
+      ref: 'Job',
+      required: [true, 'Job é obrigatório'],
+      index: true
+    },
+    
+    checkIn: {
+      timestamp: {
+        type: Date,
+        required: [true, 'Timestamp do check-in é obrigatório'],
+        default: Date.now
+      },
+      location: {
+        type: String,
+        required: [true, 'Localização do check-in é obrigatória'],
+        trim: true,
+        maxlength: [500, 'Localização não pode exceder 500 caracteres']
+      },
+      coordinates: {
+        latitude: {
+          type: Number,
+          min: -90,
+          max: 90
+        },
+        longitude: {
+          type: Number,
+          min: -180,
+          max: 180
+        }
+      },
+      photos: [workPhotoSchema], // ✅ CORRIGIDO: Usando o sub-schema
+      notes: {
+        type: String,
+        trim: true,
+        maxlength: [1000, 'Notas não podem exceder 1000 caracteres']
+      },
+      ipAddress: {
+        type: String,
+        trim: true
+      }
+    },
+    
+    checkOut: {
+      timestamp: {
+        type: Date
+      },
+      location: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Localização não pode exceder 500 caracteres']
+      },
+      coordinates: {
+        latitude: {
+          type: Number,
+          min: -90,
+          max: 90
+        },
+        longitude: {
+          type: Number,
+          min: -180,
+          max: 180
+        }
+      },
+      photos: [workPhotoSchema], // ✅ CORRIGIDO: Usando o sub-schema
+      hoursWorked: {
+        type: Number,
+        min: [0.25, 'Horas trabalhadas devem ser pelo menos 15 minutos'],
+        max: [24, 'Horas trabalhadas não podem exceder 24 horas']
+      },
+      completionNotes: {
+        type: String,
+        trim: true,
+        maxlength: [2000, 'Notas de conclusão não podem exceder 2000 caracteres']
+      },
+      ipAddress: {
+        type: String,
+        trim: true
+      }
+    },
+    
+    status: {
+      type: String,
+      enum: {
+        values: ['active', 'completed', 'cancelled'],
+        message: 'Status deve ser active, completed ou cancelled'
+      },
+      default: 'active',
+      index: true
+    },
+    
+    totalHours: {
+      type: Number,
+      min: [0, 'Horas totais não podem ser negativas']
+    },
+    
+    breakTime: {
+      type: Number,
+      min: [0, 'Tempo de pausa não pode ser negativo'],
+      default: 0
+    },
+    
+    paymentStatus: {
+      type: String,
+      enum: {
+        values: ['pending', 'confirmed', 'processed', 'paid'],
+        message: 'Status de pagamento inválido'
+      },
+      default: 'pending'
+    },
+    
+    calculatedAmount: {
+      type: Number,
+      min: [0, 'Valor calculado não pode ser negativo']
+    },
+    
+    dispute: {
+      raisedBy: {
+        type: String,
+        enum: ['worker', 'company']
+      },
+      reason: {
+        type: String,
+        trim: true,
+        maxlength: [1000, 'Motivo da disputa não pode exceder 1000 caracteres']
+      },
+      raisedAt: {
+        type: Date
+      },
+      resolvedAt: {
+        type: Date
+      },
+      resolution: {
+        type: String,
+        trim: true,
+        maxlength: [2000, 'Resolução não pode exceder 2000 caracteres']
+      }
+    },
+    
+    workDate: {
+      type: Date,
+      required: [true, 'Data do trabalho é obrigatória'],
+      index: true
+    }
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      }
+    }
+  }
+);
+
+// 📊 Indexes para performance (OTIMIZADOS)
+workSessionSchema.index({ contract: 1, workDate: -1 });
+workSessionSchema.index({ worker: 1, status: 1 });
+workSessionSchema.index({ company: 1, status: 1 });
+workSessionSchema.index({ job: 1 });
+workSessionSchema.index({ 
+  'checkIn.timestamp': 1,
+  status: 1 
+});
+workSessionSchema.index({ 
+  createdAt: -1 
+});
+workSessionSchema.index({
+  workDate: 1,
+  status: 1,
+  paymentStatus: 1
+});
+
+// 🔄 Middleware para calcular horas totais e datas
+workSessionSchema.pre('save', function(next) {
+  // Definir workDate baseado no check-in se não estiver definido
+  if (!this.workDate && this.checkIn?.timestamp) {
+    const checkInDate = new Date(this.checkIn.timestamp);
+    checkInDate.setHours(0, 0, 0, 0);
+    this.workDate = checkInDate;
+  }
+  
+  // Calcular horas totais no check-out
+  if (this.checkOut && this.checkOut.hoursWorked && !this.totalHours) {
+    this.totalHours = this.checkOut.hoursWorked - (this.breakTime || 0) / 60;
+    
+    // Garantir que horas totais não sejam negativas
+    if (this.totalHours < 0) {
+      this.totalHours = 0;
+    }
+  }
+  
+  next();
+});
+
+// 🔄 Middleware para validação de datas
+workSessionSchema.pre('save', function(next) {
+  if (this.checkOut?.timestamp && this.checkIn?.timestamp) {
+    if (this.checkOut.timestamp < this.checkIn.timestamp) {
+      return next(new Error('Check-out não pode ser anterior ao check-in'));
+    }
+  }
+  next();
+});
+
+export const WorkSession: Model<IWorkSession> = mongoose.model<IWorkSession>('WorkSession', workSessionSchema);

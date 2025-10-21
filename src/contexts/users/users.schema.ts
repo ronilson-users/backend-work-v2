@@ -1,55 +1,81 @@
+// src/contexts/users/users.schema.ts - VERSÃO COMPLETA
 import { z } from 'zod';
 
-/**
- * Schema de criação de usuário (registro)
- */
-export const UserRegisterSchema = z.object({
-  name: z.string().min(3, 'Name must have at least 3 characters'),
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must have at least 6 characters'),
-  role: z.enum(['user', 'company']).default('user'), // Usuário comum ou empresa
-});
-
-/**
- * Schema de login de usuário
- */
- 
-export const UserLoginSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(6, 'Password must have at least 6 characters'),
-});
-
-
-/**
- * Centralized Role enum so every consumer uses the same set of roles.
- */
- 
-export const RoleEnum = z.enum(['user', 'company', 'admin']);
+export const RoleEnum = z.enum(['user', 'worker', 'company', 'admin']);
 export type Role = z.infer<typeof RoleEnum>;
 
 /**
- * Example create user schema — set default role to 'user'.
- * Adjust the rest of the schema fields to match your existing file.
+ * Days of week enum
  */
- 
-export const createUserSchema = z.object({
-  // ... other fields (name, email, etc.)
-  role: RoleEnum.default('user'), // Usuário comum, empresa ou admin
+export const DayOfWeekEnum = z.enum([
+  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+]);
+
+/**
+ * Availability type enum
+ */
+export const AvailabilityTypeEnum = z.enum([
+  'full-time', 'part-time', 'flexible'
+]);
+
+/**
+ * Schema para Registro
+ */
+export const UserRegisterSchema = z.object({
+  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+  role: RoleEnum.default('user'),
 });
 
 /**
- * Example update user schema — role is optional on updates,
- * but still restricted to the enum values.
- */export const updateUserSchema = z.object({
-  // ... other updatable fields
-  role: RoleEnum.optional(),
+ * Schema para Login
+ */
+export const UserLoginSchema = z.object({
+  email: z.string().email('Formato de email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 });
 
+/**
+ * Schema para Disponibilidade
+ */
+export const UserAvailabilitySchema = z.object({
+  availability: z.object({
+    days: z.array(DayOfWeekEnum).min(1, 'Selecione pelo menos um dia'),
+    hours: z.string().regex(/^\d{2}:\d{2}-\d{2}:\d{2}$/, 'Formato deve ser HH:MM-HH:MM'),
+    type: AvailabilityTypeEnum
+  })
+});
+
+/**
+ * Schema para Skills
+ */
+export const UserSkillsSchema = z.object({
+  skills: z.array(z.string().min(1, 'Skill não pode ser vazia')).min(1, 'Adicione pelo menos uma skill')
+});
+
+/**
+ * Schema para Atualizar Perfil
+ */
+export const UserUpdateProfileSchema = z.object({
+  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
+  profile: z.object({
+    bio: z.string().max(500, 'Bio não pode exceder 500 caracteres').optional(),
+    phone: z.string().optional(),
+    location: z.string().max(200, 'Localização não pode exceder 200 caracteres').optional(),
+    hourlyRate: z.object({
+      min: z.number().min(0, 'Valor mínimo deve ser positivo').optional(),
+      max: z.number().min(0, 'Valor máximo deve ser positivo').optional(),
+      currency: z.string().default('BRL').optional()
+    }).optional()
+  }).optional()
+});
+
+/**
+ * Tipos para usar no código
+ */
 export type UserRegisterData = z.infer<typeof UserRegisterSchema>;
 export type UserLoginData = z.infer<typeof UserLoginSchema>;
-export type UserUpdateData = z.infer<typeof UserUpdateSchema>;
-
-
-
-
-
+export type UserAvailabilityData = z.infer<typeof UserAvailabilitySchema>;
+export type UserSkillsData = z.infer<typeof UserSkillsSchema>;
+export type UserUpdateProfileData = z.infer<typeof UserUpdateProfileSchema>;

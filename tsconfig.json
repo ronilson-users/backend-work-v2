@@ -5,7 +5,7 @@
       "@/*": ["*"],
       "@contexts/*": ["contexts/*"],
       "@shared/*": ["shared/*"],
-      "@test/*": ["../__test/*"]
+      "@test/*": ["../__tests__/*"]
     },
     "target": "ES2022",
     "module": "ESNext",
@@ -18,5 +18,5 @@
     "outDir": "dist",
     "resolveJsonModule": true
   },
-  "include": ["src", "__test"]  
+  "include": ["src", "__tests__"]  
 }
