@@ -36,4 +36,10 @@ router.use('/payments', paymentRoutes);// em analise
 
 export default router;
 
+/**
+ * 🎯 RESTful Pattern Reference:
+
+
+ */
+
 

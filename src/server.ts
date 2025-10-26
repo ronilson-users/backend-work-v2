@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 
 import { env } from '@/shared/config/env';
-import { connectDatabase } from './shared/config/database';
+import { connectDatabase } from '@/shared/config/database';
 import routes  from './routes/';
 import { errorHandler } from '@/shared/middleware/errorHandler';
 import { logger, httpLogger } from '@/shared/utils/logger';

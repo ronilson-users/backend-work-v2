@@ -1,8 +1,8 @@
-// src/contexts/work/work.schema.ts - VERSÃO CORRIGIDA
+// src/contexts/work/work.schema.ts
 import { z } from 'zod';
 
 /**
- * Schema para check-in (MANTIDO SIMPLES)
+ * Schema para check-in 
  */
 export const CheckInSchema = z.object({
   body: z.object({
@@ -17,7 +17,7 @@ export const CheckInSchema = z.object({
 });
 
 /**
- * Schema para check-out (MANTIDO SIMPLES)
+ * Schema para check-out 
  */
 export const CheckOutSchema = z.object({
   body: z.object({
@@ -37,7 +37,7 @@ export const CheckOutSchema = z.object({
  */
 export const UploadPhotoSchema = z.object({
   body: z.object({
-    photoUrl: z.string().url('URL da foto deve ser válida').optional(), // ✅ URL direta
+    photoUrl: z.string().url('URL da foto deve ser válida').optional(), 
     photoData: z.string().optional(), // base64 alternativo
     type: z.enum(['check-in', 'check-out', 'work']),
     contractId: z.string().optional()

@@ -1,0 +1,35 @@
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Carlos Motorista",
+  "email": "carlos.motorista@email.com",
+  "password": "senha123",
+  "phone": "+5511999999999",
+  "cpf": "123.456.789-00",
+  "userType": "worker",
+  "skills": ["direção", "logística", "entregas"],
+  "vehicleType": "carro",
+  "category": "delivery"
+}
+
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "carlos.motorista@email.com",
+  "password": "senha123"
+}
+
+GET http://localhost:3001/api/jobs
+Authorization: Bearer <SEU_TOKEN>
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZmQ4ZDExODhlY2IxOTZhZjBmNjk5ZSIsImVtYWlsIjoiY2FybG9zLm1vdG9yaXN0YUBlbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc2MTQ0NzI1MiwiZXhwIjoxNzYyMDUyMDUyfQ.i0upky7BvpM9YJhuxPXwaqJsbs-0kUM5u8uD_kNzfC0
+  
+  POST http://localhost:3001/api/users/skills
+Authorization: Bearer <SEU_TOKEN>
+Content-Type: application/json
+
+{
+  "skills": ["direção defensiva", "rota otimizada", "atendimento ao cliente"]
+}

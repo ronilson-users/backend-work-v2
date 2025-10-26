@@ -12,7 +12,8 @@
   "test:integration": "jest __tests__/integration",
   "test:watch": "jest --watch",
   "test:coverage": "jest --coverage",
-  "test:auth": "jest __tests__/unit/middleware/auth.test.ts"
+  "test:auth": "jest __tests__/unit/auth/ --verbose",
+  "test:middleware": "jest __tests__/unit/middleware/ --verbose"
  },
  "dependencies": {
   "bcryptjs": "^2.4.3",

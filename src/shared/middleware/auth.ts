@@ -10,24 +10,26 @@ export const authenticate = async (
 ) => {
   try {
     const authHeader = req.header('Authorization');
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new AppError('Token de acesso não fornecido', 401);
     }
 
-    const token = authHeader.substring(7); // Remove "Bearer "
-    
-    const decoded = authService.verifyToken(token) as any;
-    
-    // Adicionar usuário à request
+    const token = authHeader.substring(7);
+    const decoded = authService.verifyToken(token);
+
+    if (!decoded) { 
+      throw new AppError('Token inválido ou expirado', 401);
+    }
+
     (req as any).user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role
+      id: (decoded as any).id,
+      email: (decoded as any).email,
+      role: (decoded as any).role
     };
 
     next();
   } catch (error) {
-    next(new AppError('Token inválido ou expirado', 401));
+    next(error);
   }
 };

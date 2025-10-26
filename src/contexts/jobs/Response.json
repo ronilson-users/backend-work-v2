@@ -1,0 +1,70 @@
+
+{
+ "jobs": [
+  {
+   "budget": {
+    "min": 150,
+    "max": 250,
+    "type": "daily",
+    "currency": "BRL"
+   },
+   "dates": {
+    "start": "2025-10-25T08:00:00.000Z",
+    "end": "2025-10-30T17:00:00.000Z"
+   },
+   "routeConfig": {
+    "maxLocationsPerDay": 5,
+    "allowLocationReplacement": true,
+    "requirePhotoEachLocation": true,
+    "travelTimeBetweenLocations": 30
+   },
+   "title": "Motorista de Entrega",
+   "description": "Responsável por realizar entregas em pontos comerciais.",
+   "company": {
+    "name": "Tecnutri LTDA",
+    "profile": {
+     "rating": 0,
+     "companyName": "Tecnutri LTDA"
+    },
+    "id": "68fbf0754a1d0677fa996018"
+   },
+   "location": "São Paulo - SP",
+   "requiredSkills": [
+    "CNH B",
+    "Pontualidade",
+    "Comunicação"
+   ],
+   "duration": "5 dias",
+   "status": "open",
+   "applicants": [
+    {
+     "name": "Roni Developer",
+     "profile": {
+      "skills": []
+     },
+     "id": "68fbefc44a1d0677fa996013"
+    }
+   ],
+   "workType": "multi_location_route",
+   "locations": [
+    {
+     "sequence": 1,
+     "name": "Supermercado BomPreço",
+     "address": "Rua das Flores, 120 - São Paulo",
+     "type": "supermarket"
+    },
+    {
+     "sequence": 2,
+     "name": "Loja PontoCerto",
+     "address": "Av. Paulista, 3000 - São Paulo",
+     "type": "store"
+    }
+   ],
+   "createdAt": "2025-10-24T22:31:11.196Z",
+   "updatedAt": "2025-10-24T22:49:03.937Z",
+   "id": "68fbfe2f373721ae990cf500"
+  }
+ ],
+ "total": 1
+}
+

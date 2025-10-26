@@ -61,6 +61,11 @@ export interface IContract extends Document {
  completedAt?: Date;
 }
 
+
+
+//========================
+//
+//========================
 const contractSchema = new Schema<IContract>(
  {
   job: {
@@ -209,9 +214,9 @@ const contractSchema = new Schema<IContract>(
  }
 );
 
-//==========================
+//========================
 //Indexes para performance
-//==========================
+//========================
 contractSchema.index({ job: 1 });
 contractSchema.index({ worker: 1 });
 contractSchema.index({ company: 1 });
@@ -220,9 +225,9 @@ contractSchema.index({ 'terms.schedule.startDate': 1 });
 contractSchema.index({ 'terms.schedule.endDate': 1 });
 contractSchema.index({ createdAt: -1 });
 
-//=================================
+//=============================================
 // Middleware para atualizar datas automáticas
-//=================================
+//=============================================
 contractSchema.pre('save', function (next) {
  if (this.status === 'active' && !this.activatedAt) {
   this.activatedAt = new Date();
@@ -233,4 +238,8 @@ contractSchema.pre('save', function (next) {
  next();
 });
 
+
+//========================
+//
+//========================
 export const Contract: Model<IContract> = mongoose.model<IContract>('Contract', contractSchema);

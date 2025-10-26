@@ -1,7 +1,8 @@
 import { User, IUser } from './users.model';
-import { AppError } from '../../shared/utils/error';
-import { logger } from '../../shared/utils/logger';
+import { AppError } from '@/shared/utils/error';
+import { logger } from '@/shared/utils/logger';
 
+//
 export const createUser = async (data: { name: string; email: string; password: string; role: string }) => {
  
   const start = Date.now();
@@ -15,18 +16,22 @@ export const createUser = async (data: { name: string; email: string; password: 
   return savedUser;
 };
 
+//
 export const findUserByEmail = async (email: string) => {
   return await User.findOne({ email });
 };
 
+//
 export const getAllUsers = async () => {
   return await User.find().select('-password');
 };
 
+//
 export const getUserProfile = async (userId: string) => {
   return await User.findById(userId).select('-password');
 };
 
+//
 export const updateUserProfile = async (userId: string, updateData: Partial<IUser>) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError('Usuário não encontrado', 404);
@@ -46,6 +51,7 @@ export const updateUserProfile = async (userId: string, updateData: Partial<IUse
   return updated;
 };
 
+//
 export const updateUserAvailability = async (userId: string, availability: any) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError('Usuário não encontrado', 404);
@@ -55,16 +61,22 @@ export const updateUserAvailability = async (userId: string, availability: any) 
   return await user.save();
 };
 
+//
 export const addUserSkills = async (userId: string, skills: string[]) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError('Usuário não encontrado', 404);
-  if (user.role !== 'worker') throw new AppError('Apenas workers podem adicionar skills', 403);
+  
+  // Permite user e worker
+  if (!['user', 'worker'].includes(user.role)) {
+    throw new AppError('Apenas users e workers podem adicionar skills', 403);
+  }
 
   const newSkills = skills.filter(skill => !user.profile.skills?.includes(skill));
   user.profile.skills = [...(user.profile.skills || []), ...newSkills];
   return await user.save();
 };
 
+//
 export const findWorkersByCriteria = async (criteria: {
   skills?: string[];
   location?: string;

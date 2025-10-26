@@ -29,10 +29,10 @@ export const contractRoutes = router;
 
 /**
  * 🎯 RESTful Pattern Reference:
- * POST   /              → 
- * GET    /my              → 
- * GET   /contractId           → 
- * PATCH   /contractId/status    → 
- * POST  /contractId/sign       → 
- * POST   /from-job/:jobId      → 
+ * POST    /                    → 
+ * GET     /my                  → 
+ * GET     /contractId          → 
+ * PATCH   /contractId/status   → 
+ * POST    /contractId/sign     → 
+ * POST    /from-job/:jobId     → 
  */

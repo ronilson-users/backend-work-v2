@@ -14,7 +14,8 @@ import { logger } from "@/shared/utils/logger";
 import { AppError } from "@/shared/utils/error";
 
 export const userController = {
- 
+
+ // Registrar usuario
  async register(req: Request, res: Response, next: NextFunction) {
   try {
    const user = await createUser(req.body);
@@ -36,10 +37,7 @@ export const userController = {
   }
  },
 
- /**
- * Buscar usuário por email
- */
-
+ // Buscar usuario por email
  async findByEmail(req: Request, res: Response, next: NextFunction) {
   try {
    const { email } = req.params;
@@ -63,9 +61,7 @@ export const userController = {
   }
  },
 
- /**
- * Listar todos os usuários
- */
+ // Listar todos os usuários
  async getAll(req: Request, res: Response, next: NextFunction) {
   try {
    const users = await getAllUsers();
@@ -80,9 +76,7 @@ export const userController = {
   }
  },
 
- /**
- * Buscar perfil do usuário autenticado
- */
+ // Buscar perfil do usuário autenticado
  async getProfile(req: Request, res: Response, next: NextFunction) {
   try {
    const userId = (req as any).user?.id;
@@ -111,9 +105,7 @@ export const userController = {
   }
  },
 
- /**
- * Atualizar perfil do usuário autenticado
- */
+ // Atualizar perfil do usuário autenticado
  async updateProfile(req: Request, res: Response, next: NextFunction) {
   try {
    const userId = (req as any).user?.id;
@@ -142,9 +134,7 @@ export const userController = {
   }
  },
 
- /**
- * Atualizar disponibilidade (somente workers)
- */
+ // Atualizar disponibilidade (somente workers)
  async updateAvailability(req: Request, res: Response, next: NextFunction) {
   try {
    const userId = (req as any).user?.id;
@@ -167,9 +157,7 @@ export const userController = {
   }
  },
 
- /**
- * Adicionar skills (somente workers)
- */
+ // Adicionar skills (somente workers)
  async addSkills(req: Request, res: Response, next: NextFunction) {
   try {
    const userId = (req as any).user?.id;

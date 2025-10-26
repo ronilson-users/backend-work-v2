@@ -7,7 +7,6 @@
 // Barrel exports para todas as rotas
 
 
-
 // src/contexts/auth 
 export {
  authRoutes
@@ -48,3 +47,4 @@ export {
  workRoutes
 
 } from './work/work.routes';
+

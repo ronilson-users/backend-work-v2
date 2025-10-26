@@ -1,12 +1,14 @@
 // src/contexts/work/work.controller.ts
 import { Request, Response, NextFunction } from 'express';
+
+import { RouteService } from './route.service'; 
 import { WorkService } from './work.service';
-import { asyncHandler } from '../../shared/utils/asyncHandler';
-import { AppError } from '../../shared/utils/error';
+import { asyncHandler } from '@/shared/utils/asyncHandler';
+import { AppError } from '@/shared/utils/error';
 
 export const workController = {
   /**
-   * ✅ Fazer check-in para um contrato
+   * Fazer check-in para um contrato
    */
   checkIn: asyncHandler(async (req: Request, res: Response) => {
     const { contractId } = req.params;
@@ -30,7 +32,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Fazer check-out para uma sessão
+   * Fazer check-out para uma sessão
    */
   checkOut: asyncHandler(async (req: Request, res: Response) => {
     const { sessionId } = req.params;
@@ -60,7 +62,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Upload de foto (separado para flexibilidade)
+   * Upload de foto (separado para flexibilidade)
    */
   uploadPhoto: asyncHandler(async (req: Request, res: Response) => {
     // Por enquanto, vamos aceitar URLs/base64 diretamente
@@ -87,7 +89,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Buscar sessões do worker autenticado
+   * Buscar sessões do worker autenticado
    */
   getMySessions: asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
@@ -121,7 +123,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Buscar sessão específica
+   *  Buscar sessão específica
    */
   getSession: asyncHandler(async (req: Request, res: Response) => {
     const { sessionId } = req.params;
@@ -147,7 +149,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Empresa confirmar sessão (para pagamento)
+   *  Empresa confirmar sessão (para pagamento)
    */
   confirmSession: asyncHandler(async (req: Request, res: Response) => {
     const { sessionId } = req.params;
@@ -163,7 +165,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Buscar sessões de um contrato específico
+   * Buscar sessões de um contrato específico
    */
   getContractSessions: asyncHandler(async (req: Request, res: Response) => {
     const { contractId } = req.params;
@@ -181,7 +183,7 @@ export const workController = {
   }),
 
   /**
-   * ✅ Estatísticas de trabalho (dashboard)
+   *  Estatísticas de trabalho (dashboard)
    */
   getWorkStats: asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
@@ -207,5 +209,118 @@ export const workController = {
       success: true,
       data: stats
     });
+  }),
+  
+  
+ /**
+   *  Criar sessão de rota para contrato
+   */
+  createRouteSession: asyncHandler(async (req: Request, res: Response) => {
+    const { contractId } = req.params;
+    const workerId = (req as any).user.id;
+    const { jobId } = req.body; // jobId é necessário para buscar as locations
+    
+    if (!jobId) {
+      throw new AppError('jobId é obrigatório para criar sessão de rota', 400);
+    }
+    
+    const workSession = await RouteService.createRouteSession(contractId, workerId, jobId);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Sessão de rota criada com sucesso',
+      data: workSession
+    });
+  }),
+
+  /**
+   *  Check-in em local específico da rota
+   */
+  checkInLocation: asyncHandler(async (req: Request, res: Response) => {
+    const { sessionId, locationIndex } = req.params;
+    const workerId = (req as any).user.id;
+    
+    const { photos, notes, coordinates } = req.body;
+    
+    // Validar locationIndex
+    const locationIndexNum = parseInt(locationIndex);
+    if (isNaN(locationIndexNum) || locationIndexNum < 0) {
+      throw new AppError('Índice do local inválido', 400);
+    }
+    
+    const workSession = await RouteService.checkInLocation(
+      sessionId, 
+      locationIndexNum, 
+      { photos: photos || [], notes, coordinates }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Check-in no local realizado com sucesso',
+      data: workSession
+    });
+  }),
+
+  /**
+   *  Check-out de local específico + próximo destino
+   */
+  checkOutLocation: asyncHandler(async (req: Request, res: Response) => {
+    const { sessionId, locationIndex } = req.params;
+    const workerId = (req as any).user.id;
+    
+    const { photos, notes, coordinates } = req.body;
+    
+    // Validar locationIndex
+    const locationIndexNum = parseInt(locationIndex);
+    if (isNaN(locationIndexNum) || locationIndexNum < 0) {
+      throw new AppError('Índice do local inválido', 400);
+    }
+    
+    const result = await RouteService.checkOutLocation(
+      sessionId,
+      locationIndexNum,
+      { photos: photos || [], notes, coordinates }
+    );
+    
+    res.json({
+      success: true,
+      message: result.isRouteComplete 
+        ? 'Rota completada com sucesso!' 
+        : 'Check-out realizado. Próximo local disponível.',
+      data: {
+        session: result.session,
+        nextLocation: result.nextLocation,
+        isRouteComplete: result.isRouteComplete
+      }
+    });
+  }),
+
+  /**
+   *  Substituir local na rota
+   */
+  replaceLocation: asyncHandler(async (req: Request, res: Response) => {
+    const { sessionId } = req.params;
+    const workerId = (req as any).user.id;
+    
+    const { originalLocationIndex, newLocation, reason } = req.body;
+    
+    if (originalLocationIndex === undefined || !newLocation) {
+      throw new AppError('originalLocationIndex e newLocation são obrigatórios', 400);
+    }
+    
+    const workSession = await RouteService.replaceLocation(
+      sessionId,
+      originalLocationIndex,
+      { ...newLocation, reason }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Local substituído na rota com sucesso',
+      data: workSession
+    });
   })
+  
+  
+  
 };

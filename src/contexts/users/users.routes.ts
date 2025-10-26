@@ -1,8 +1,8 @@
-// src/contexts/users/users.routes.ts - VERSÃO COMPLETA
+// src/contexts/users/users.routes.ts 
 import { Router } from 'express';
 import { userController } from './users.controller';
-import { validateBody } from '../../shared/middleware/validate';
-import { authenticate } from '../../shared/middleware/auth';
+import { validateBody } from '@/shared/middleware/validate';
+import { authenticate } from '@/shared/middleware/auth';
 import { 
   UserRegisterSchema, 
   UserAvailabilitySchema,

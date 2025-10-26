@@ -1,4 +1,4 @@
-// src/contexts/work/work.service.ts - VERSÃO CORRIGIDA
+// src/contexts/work/work.service.ts 
 import { WorkSession, IWorkSession, WorkPhoto } from './work.model';
 import { Contract } from '../contracts/contracts.model';
 import { AppError } from '../../shared/utils/error';
@@ -51,7 +51,7 @@ export class WorkService {
  static async checkIn(contractId: string, workerId: string, checkInData: any): Promise<IWorkSession> {
   const contract = await Contract.findById(contractId)
     .populate('job')
-    .populate('worker') // ⚠️ Isso retorna OBJETO completo, não ID
+    .populate('worker') 
     .populate('company');
   
   if (!contract) {
@@ -69,6 +69,8 @@ export class WorkService {
     contractWorkerId = contract.worker.toString();
   }
   
+  
+  /// area para debugar resultados
   console.log('🔍 DEBUG Check-in:');
   console.log('  - Contract worker ID:', contractWorkerId);
   console.log('  - Authenticated worker ID:', workerId);
@@ -82,61 +84,7 @@ export class WorkService {
 }
 
   /**
-   * Fazer check-out para uma sessão ativa 
    * 
-   * /
-   
-  static async checkOut(sessionId: string, workerId: string, checkOutData: any): Promise<IWorkSession> {
-    const workSession = await WorkSession.findById(sessionId);
-    
-    if (!workSession) {
-      throw new AppError('Sessão de trabalho não encontrada', 404);
-    }
-    
-    // Verificar se worker é o dono da sessão
-    if (workSession.worker.toString() !== workerId) {
-      throw new AppError('Apenas o worker da sessão pode fazer check-out', 403);
-    }
-    
-    // Verificar se sessão está ativa
-    if (workSession.status !== 'active') {
-      throw new AppError('Sessão não está ativa', 400);
-    }
-    
-    // Verificar se já tem check-out
-    if (workSession.checkOut) {
-      throw new AppError('Check-out já realizado para esta sessão', 400);
-    }
-    
-    // ✅ CORREÇÃO: Converter fotos de string[] para WorkPhoto[]
-    const workPhotos = this.convertToWorkPhotos(checkOutData.photos || [], 'check-out');
-    
-    // Atualizar com check-out
-    workSession.checkOut = {
-      timestamp: new Date(),
-      location: checkOutData.location,
-      coordinates: checkOutData.coordinates,
-      photos: workPhotos, // ✅ AGORA é WorkPhoto[] convertido
-      hoursWorked: checkOutData.hoursWorked,
-      completionNotes: checkOutData.completionNotes,
-      ipAddress: checkOutData.ipAddress
-    };
-    
-    workSession.status = 'completed';
-    
-    // Calcular valor
-    const contract = await Contract.findById(workSession.contract);
-    if (contract) {
-      workSession.calculatedAmount = this.calculateAmount(
-        checkOutData.hoursWorked,
-        contract.terms.compensation
-      );
-    }
-    
-    return await workSession.save();
-  }
-  /**
-   * Calcular valor baseado nas horas e tipo de compensação
    */
   private static calculateAmount(hoursWorked: number, compensation: any): number {
     switch (compensation.type) {

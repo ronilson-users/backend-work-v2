@@ -59,7 +59,7 @@ export interface IUser extends Document {
  name: string;
  email: string;
  password: string;
- role: 'user' | 'worker' | 'company' | 'admin'; // ✅ Adicionar 'user'
+ role: 'user' | 'worker' | 'company' | 'admin'; 
  profile: IProfile;
  isActive: boolean;
  lastLogin?: Date;
@@ -205,9 +205,9 @@ const userSchema = new Schema<IUser>(
   },
   role: {
    type: String,
-   enum: ['user', 'worker', 'company', 'admin'], // ✅ Adicionar 'user'
+   enum: ['user', 'worker', 'company', 'admin'], 
    required: [true, 'Tipo de usuário é obrigatório'],
-   default: 'user' // ✅ Mudar para 'user'
+   default: 'user' 
   },
   profile: {
    type: profileSchema,
@@ -260,7 +260,8 @@ userSchema.pre('findOneAndUpdate', async function (next) {
  }
  next();
 });
-// 🔐 MÉTODO - Comparar password
+
+// 🔐 Comparar password
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
  try {
   return await bcrypt.compare(candidatePassword, this.password);
@@ -269,38 +270,33 @@ userSchema.methods.comparePassword = async function (candidatePassword: string):
  }
 };
 
-// 🔐 MÉTODO - Atualizar lastLogin
+// 🔐  - Atualizar lastLogin
 userSchema.methods.updateLastLogin = async function (): Promise<void> {
  this.lastLogin = new Date();
  await this.save();
 };
 
-// 📊 INDEXES para performance - REMOVA se já estiver usando 'unique: true' no campo
-// userSchema.index({ email: 1 }, { unique: true }); // ⚠️ COMENTE ESTA LINHA se já tem 'unique: true' no campo email
+// 📊 INDEXES para performance 
+
 userSchema.index({ role: 1 });
 userSchema.index({ 'profile.skills': 1 });
 userSchema.index({ 'profile.location': 1 });
 userSchema.index({ 'profile.rating': -1 });
 userSchema.index({ createdAt: -1 });
-
-// ✅ VALIDAÇÃO CORRIGIDA - Linha ~291 no users.model.ts
 userSchema.pre('save', function (next) {
   if (this.role === 'company') {
-    // ✅ CORREÇÃO: Só validar se tentou definir companyName como vazio
-    // Permite criar empresa e depois completar o profile via update
-    if (this.profile?.companyName === '') {
-      next(new Error('Nome da empresa é obrigatório para empresas'));
-      return;
+    
+    if (!this.profile) {
+      this.profile = {};
     }
     
-    // ✅ Define valores padrão para company profile
-    if (!this.profile.companyName) {
-      this.profile.companyName = this.name; // Usa o nome como fallback
+    // Usa o nome como fallback para companyName
+    if (!this.profile.companyName && this.name) {
+      this.profile.companyName = this.name;
     }
   }
 
   if (this.role === 'worker') {
-    // Worker pode ter skills vazias, mas não undefined
     if (!this.profile.skills) {
       this.profile.skills = [];
     }
@@ -309,6 +305,4 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-
-// ✅ EXPORT
 export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
